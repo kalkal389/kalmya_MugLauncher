@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>☕ マグカップランチャー！- VRChatで最高のコーヒー体験を！</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&family=Kosugi+Maru&display=swap" rel="stylesheet">
+    <style>
+        /* =================================================================
+         * CSS変数定義 (カラーパレット)
+         * ================================================================= */
+        :root {
+            --coffee-dark: #4A2C2A;      /* 深いコーヒー色 */
+            --coffee-medium: #6F4E37;    /* ミュートコーヒー色 */
+            --coffee-light: #B48D6C;     /* 明るいコーヒー色 */
+            --cream: #F5E9D5;          /* クリーム色 */
+            --milk: #FFFBF5;           /* ミルク色 (背景) */
+            --text-color-dark: #333333;
+            --text-color-light: #FFFFFF;
+            --orange-vibrant: #FF8C00;   /* 鮮やかなオレンジ */
+        }
+
+        /* =================================================================
+         * 基本スタイル & 全体レイアウト
+         * ================================================================= */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'M PLUS Rounded 1c', 'Kosugi Maru', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--milk);
+            color: var(--text-color-dark);
+            line-height: 1.8;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+            background-color: var(--milk);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .no-scroll {
+            overflow: hidden;
+        }
+
+        /* =================================================================
+         * 背景アニメーション (水玉)
+         * ================================================================= */
+        .bubbles-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+            background-color: #8B4513; /* デフォルトのコーヒー色 */
+            animation-name: bubbleFloat;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        /* ★★★ 修正点: 水玉をさらに薄く ★★★ */
+        @keyframes bubbleFloat {
+            0% { transform: translateY(100vh); opacity: 0; }
+            10%, 90% { opacity: 0.2; } /* 透明度を0.4から0.2に変更 */
+            100% { transform: translateY(-10vh); opacity: 0; }
+        }
+
+        /* =================================================================
+         * ヘッダー & ヒーローセクション
+         * ================================================================= */
+        .page-header {
+            position: relative;
+        }
+        
+        .genre-section {
+            padding: 10px 20px;
+            text-align: left;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .genre-tag {
+            display: flex;
+            align-items: center;
+            color: var(--orange-vibrant);
+            font-size: 1.1em;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .genre-tag::before,
+        .genre-tag::after {
+            content: '';
+            flex-grow: 1;
+            height: 2px;
+            background-color: var(--orange-vibrant);
+            margin: 0 15px;
+            max-width: 10px;
+        }
+
+        .hero-section {
+            display: block;
+            text-decoration: none;
+            position: relative;
+            text-align: center;
+            overflow: hidden; /* ぼかし画像の縁を隠すために必須 */
+            color: var(--text-color-light);
+            background-color: var(--coffee-dark);
+            min-height: 500px;
+            cursor: pointer;
+        }
+
+        .hero-section::before,
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://booth.pximg.net/1ddbf904-c568-4068-beca-24636759f733/i/7035235/1f0abe13-cbcc-41ce-a695-88a81e1f04c1_base_resized.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+        }
+
+        /* ★★★ 修正点: ぼかし画像の縁の影を削除 ★★★ */
+        .hero-section::before {
+            background-size: cover;
+            filter: blur(15px);
+            opacity: 0.8;
+            z-index: 0;
+            transform: scale(1.1); /* ぼかしの縁のにじみを隠すために少し拡大 */
+        }
+
+        .hero-section::after {
+            background-size: contain;
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 2;
+        }
+        
+        .hero-cta-text {
+            font-size: 0.9em;
+            font-weight: 700;
+            color: var(--text-color-light);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            background-color: rgba(74, 44, 42, 0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            transition: opacity 0.3s ease;
+        }
+
+        .hero-section:hover .hero-cta-text {
+            opacity: 0;
+        }
+
+        /* =================================================================
+         * セクション共通スタイル
+         * ================================================================= */
+        section {
+            padding: 100px 0;
+            text-align: center;
+            border-bottom: 2px solid var(--cream);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+        
+        .is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        section h2 {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-size: 3.5em;
+            font-weight: 800;
+            color: var(--coffee-dark);
+            margin: 0 auto 60px;
+            position: relative;
+            display: inline-block;
+            padding: 0 30px;
+            background: linear-gradient(135deg, var(--cream) 0%, var(--milk) 100%);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        section h2::before,
+        section h2::after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 3px;
+            background-color: var(--coffee-light);
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        section h2::before { left: -50px; }
+        section h2::after { right: -50px; }
+
+        /* =================================================================
+         * 動画 & 購入ボタンセクション
+         * ================================================================= */
+        .video-section {
+            padding: 50px 0 0;
+            text-align: center;
+            margin-top: 40px;
+            border-bottom: none;
+        }
+
+        .video-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border: 5px solid var(--coffee-medium);
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .video-caption {
+            font-size: 0.9em;
+            color: var(--coffee-medium);
+            margin-top: 15px;
+        }
+        
+        .video-caption a {
+            color: var(--coffee-dark);
+            font-weight: bold;
+        }
+        
+        .purchase-button-section {
+            padding: 40px 0;
+            text-align: center;
+            border-bottom: 2px solid var(--cream);
+        }
+
+        .purchase-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--coffee-light) 0%, var(--coffee-medium) 100%);
+            color: var(--text-color-light);
+            padding: 18px 50px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-size: 1.6em;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.4s ease;
+        }
+
+        .purchase-button:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, var(--coffee-medium) 0%, var(--coffee-dark) 100%);
+        }
+
+        /* =================================================================
+         * 商品紹介セクション
+         * ================================================================= */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 50px;
+            padding: 0 40px;
+        }
+
+        .feature-item {
+            background: linear-gradient(135deg, var(--milk) 0%, var(--cream) 100%);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            text-align: left;
+            border: 3px solid var(--coffee-light);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .feature-item img {
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 4px solid var(--coffee-medium);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .feature-item h3 {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--coffee-dark);
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .feature-item p {
+            font-size: 1.15em;
+            margin: 0;
+        }
+
+        /* =================================================================
+         * 導入方法セクション
+         * ================================================================= */
+        .steps-container {
+            padding: 0 40px;
+        }
+
+        .step-item {
+            text-align: left;
+            margin-bottom: 30px;
+        }
+        .step-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-item h3 {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--coffee-dark);
+            margin-bottom: 15px;
+        }
+
+        .step-item p {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, var(--milk) 0%, var(--cream) 100%);
+            border-radius: 8px;
+            padding: 15px 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--coffee-light);
+        }
+        
+        .highlight-text {
+            color: var(--coffee-dark);
+            font-weight: 800;
+            font-size: 1.3em;
+            display: block;
+            margin-top: 15px;
+            background: linear-gradient(90deg, var(--milk) 0%, var(--cream) 100%);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .toggle-image-button {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--coffee-medium) 0%, var(--coffee-light) 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 0 15px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .toggle-image-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .step-image-wrapper {
+            max-width: 700px;
+            margin: 0 auto;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease-out;
+        }
+
+        .step-image-wrapper.is-visible {
+            max-height: 800px;
+            opacity: 1;
+        }
+        
+        .step-image-wrapper img {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            border: 4px solid var(--coffee-medium);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            display: block;
+        }
+
+        /* =================================================================
+         * CTA & BOOTHショップ セクション
+         * ================================================================= */
+        .cta-section, .booth-shop-section {
+            padding: 100px 20px;
+            color: var(--text-color-light);
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            margin-top: 80px;
+        }
+        
+        .cta-section {
+            background-image: url('https://booth.pximg.net/1ddbf904-c568-4068-beca-24636759f733/i/7035235/1f0abe13-cbcc-41ce-a695-88a81e1f04c1_base_resized.jpg');
+            background-size: cover;
+            background-position: center center;
+        }
+
+        .booth-shop-section {
+            background-image: url('./images/Flyer_Kalmyato.png');
+            background-size: cover;
+            background-position: center center;
+        }
+
+        .cta-section::before, .booth-shop-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .cta-section::before { background-color: rgba(74, 44, 42, 0.7); }
+        .booth-shop-section::before { background-color: rgba(245, 233, 213, 0.7); }
+
+        .cta-section > *, .booth-shop-section > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-section h2 {
+            color: var(--text-color-light);
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+            background: none;
+            box-shadow: none;
+        }
+        
+        .booth-shop-section h2 {
+             color: var(--orange-vibrant);
+        }
+        .booth-shop-section h2::before,
+        .booth-shop-section h2::after {
+            background-color: var(--orange-vibrant);
+        }
+        
+        .cta-button, .booth-shop-button {
+            display: inline-block;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            transition: all 0.4s ease;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, var(--milk) 0%, var(--cream) 100%);
+            color: var(--coffee-dark);
+            padding: 22px 70px;
+            font-size: 2em;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--coffee-medium);
+        }
+        .cta-button:hover {
+            background: linear-gradient(45deg, var(--cream) 0%, var(--milk) 100%);
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .terms-text {
+            color: white;
+            font-size: 0.95em;
+            margin-top: 20px;
+        }
+        
+        .booth-shop-section p {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: var(--coffee-dark);
+        }
+
+        .booth-shop-button {
+            background: linear-gradient(135deg, #F06292 0%, #E91E63 100%);
+            color: white;
+            padding: 20px 60px;
+            font-size: 1.8em;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+        }
+        .booth-shop-button:hover {
+            background: linear-gradient(135deg, #E91E63 0%, #D81B60 100%);
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        /* =================================================================
+         * フッター
+         * ================================================================= */
+        .page-footer {
+            text-align: center;
+            padding: 40px;
+            font-size: 0.9em;
+            color: var(--coffee-medium);
+            background-color: var(--cream);
+            margin-top: 80px;
+        }
+
+        /* =================================================================
+         * 画像拡大モーダル
+         * ================================================================= */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+
+        .image-modal.is-visible {
+            display: flex;
+        }
+
+        .image-modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        /* =================================================================
+         * レスポンシブデザイン
+         * ================================================================= */
+        @media (max-width: 768px) {
+            .hero-section { min-height: 300px; }
+            .hero-cta-text { font-size: 0.8em; padding: 4px 8px; }
+            section { padding: 60px 0; }
+            section h2 { font-size: 2.5em; padding: 0 15px; }
+            section h2::before, section h2::after { width: 40px; }
+            section h2::before { left: -25px; }
+            section h2::after { right: -25px; }
+            .purchase-button { font-size: 1.3em; padding: 15px 35px; }
+            .purchase-button-section { padding: 30px 0; }
+            .feature-grid { grid-template-columns: 1fr; gap: 30px; padding: 0 20px; }
+            .feature-item { padding: 25px; }
+            .feature-item h3 { font-size: 1.8em; }
+            .feature-item p { font-size: 1em; }
+            .steps-container { padding: 0 20px; }
+            .step-item p { font-size: 1em; }
+            .cta-section, .booth-shop-section { padding: 80px 20px; margin-top: 60px;}
+            .cta-button { font-size: 1.6em; padding: 18px 50px; }
+            .booth-shop-section h2 { font-size: 2.5em; }
+            .booth-shop-button { font-size: 1.5em; padding: 15px 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bubbles-bg"></div>
+    
+    <div class="container">
+        <header class="page-header">
+            <div class="genre-section">
+                <span class="genre-tag">VRChat向けアバターギミック</span>
+            </div>
+            <a href="https://kalnet.booth.pm/items/7035235" target="_blank" rel="noopener noreferrer" class="hero-section" aria-label="BOOTH商品ページへ">
+                <div class="hero-content">
+                    <p class="hero-cta-text">クリックでBOOTHページへ！</p>
+                </div>
+            </a>
+        </header>
+
+        <main>
+            <section class="video-section">
+                <div class="video-wrapper">
+                    <div id="youtube-player"></div>
+                </div>
+                <p class="video-caption">※動画が再生されない場合は、<a href="https://youtu.be/bPYJ5Fmkllc" target="_blank" rel="noopener noreferrer">YouTubeで直接ご覧ください。</a></p>
+            </section>
+            <section class="purchase-button-section">
+                <a href="https://kalnet.booth.pm/items/7035235" target="_blank" rel="noopener noreferrer" class="purchase-button">
+                    今すぐBOOTHでGET！
+                </a>
+            </section>
+            <section id="introduction">
+                <h2>商品紹介</h2>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <img src="https://booth.pximg.net/1ddbf904-c568-4068-beca-24636759f733/i/7035235/d0329809-c845-44ff-91bc-592197421535_base_resized.jpg" alt="ハンドサインで中身を噴射している様子" class="feature-image">
+                        <h3>いきなりスプラッシュ！</h3>
+                        <p>魔法のようなおもしろマグカップ！ハンドサインを"Fist"にすると勢いよく中身を噴射できます！</p>
+                    </div>
+                    <div class="feature-item">
+                        <img src="https://booth.pximg.net/1ddbf904-c568-4068-beca-24636759f733/i/7035235/b5192ec3-5b55-4f65-85d8-01107e545fa7_base_resized.jpg" alt="マグカップがランチャーに変形している様子" class="feature-image">
+                        <h3>マグカップがランチャー化!?</h3>
+                        <p>ExMenuからランチャー化するとマグカップが伸びて高圧力で撃てるようになります！チャージや発射時には効果音も付いてて面白い！</p>
+                    </div>
+                    <div class="feature-item">
+                        <img src="https://booth.pximg.net/1ddbf904-c568-4068-beca-24636759f733/i/7035235/5cad2875-0b3e-4c24-9c30-5743333e1e71_base_resized.jpg" alt="カスタマイズメニューの画面" class="feature-image">
+                        <h3>自由自在カスタマイズ！</h3>
+                        <p>中身の変更からワールド固定、効果音のON/OFF、噴射無効化など、その場で細かく設定可能！多機能で便利なギミック！</p>
+                    </div>
+                </div>
+            </section>
+            <section id="how-to-install">
+                <h2>簡単導入ステップ</h2>
+                <div class="steps-container">
+                    <div class="step-item">
+                        <h3>1. 事前準備</h3>
+                        <p>lilToonとModularAvatarをUnityにインポートしてください。</p>
+                    </div>
+                    <div class="step-item">
+                        <h3>2. Prefab配置</h3>
+                        <p>UnityPackageをインポート後、同梱のPrefabをアバター直下にドラッグ＆ドロップ！<br>（左手用: CoffeeSplash_L, 右手用: CoffeeSplash_R）</p>
+                    </div>
+                    <div class="step-item">
+                        <h3>3. 位置調整とアップロード</h3>
+                        <p>Prefab全体をアバターの手の位置に調整するだけ！<span class="highlight-text">位置調整するだけ！</span></p>
+                        <button class="toggle-image-button">クリックで説明画像を表示/非表示</button>
+                        <div class="step-image-wrapper">
+                            <img src="https://booth.pximg.net/1ddbf904-c568-4068-beca-24636759f733/i/7035235/b5f39ee1-8608-449d-91d6-7c21453ae687_base_resized.jpg" alt="Unityでの導入手順を示した画像">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="cta-section">
+                <h2>さあ、あなたもVRChatで最高のマグカップ体験を！</h2>
+                <a href="https://kalnet.booth.pm/items/7035235" target="_blank" rel="noopener noreferrer" class="cta-button">
+                    今すぐBOOTHでGET！
+                </a>
+                <p class="terms-text"><strong>各商品の利用規約等はBOOTHの商品ページをご確認ください</strong></p>
+            </section>
+            <section class="booth-shop-section">
+                <h2>かるみゃ糖 のBOOTHショップ</h2>
+                <p><strong>他にもVRChat向けアセットを多数販売中！</strong></p>
+                <a href="https://kalnet.booth.pm/" target="_blank" rel="noopener noreferrer" class="booth-shop-button">
+                    ショップを見る！
+                </a>
+            </section>
+        </main>
+
+        <footer class="page-footer">
+            <p>© 2025 KalNet. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+    <div class="image-modal" id="image-modal">
+        <img src="" alt="拡大画像" class="image-modal-content" id="modal-image-content">
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const initYouTubePlayer = () => {
+                const videoId = 'bPYJ5Fmkllc';
+                if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
+                    window.onYouTubeIframeAPIReady = () => loadPlayer(videoId);
+                    const tag = document.createElement('script');
+                    tag.src = "https://www.youtube.com/iframe_api";
+                    const firstScriptTag = document.getElementsByTagName('script')[0];
+                    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+                } else {
+                    loadPlayer(videoId);
+                }
+            };
+            const loadPlayer = (videoId) => {
+                new YT.Player('youtube-player', {
+                    videoId: videoId,
+                    playerVars: {
+                        'autoplay': 1, 'mute': 1, 'loop': 1, 'playlist': videoId,
+                        'controls': 0, 'modestbranding': 1, 'rel': 0,
+                        'showinfo': 0, 'iv_load_policy': 3
+                    },
+                    events: { 'onReady': (event) => event.target.playVideo() }
+                });
+            };
+
+            const initScrollAnimations = () => {
+                const targets = document.querySelectorAll('section, .genre-section, .purchase-button-section');
+                const options = { root: null, rootMargin: '0px', threshold: 0.1 };
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, options);
+                targets.forEach(target => observer.observe(target));
+            };
+
+            const initBubbleAnimation = () => {
+                const container = document.querySelector('.bubbles-bg');
+                if (!container) return;
+                const bubbleCount = 20;
+                const coffeeColors = ['#8B4513', '#A0522D', '#D2691E', '#CD853F', '#F4A460', '#DAA520'];
+                for (let i = 0; i < bubbleCount; i++) {
+                    const bubble = document.createElement('div');
+                    bubble.classList.add('bubble');
+                    const size = 40 * (Math.random() * 4 + 1);
+                    const duration = Math.random() * 30 + 20;
+                    const delay = Math.random() * 10;
+                    bubble.style.width = `${size}px`;
+                    bubble.style.height = `${size}px`;
+                    bubble.style.left = `${Math.random() * 100}vw`;
+                    bubble.style.animationDuration = `${duration}s`;
+                    bubble.style.animationDelay = `${delay}s`;
+                    bubble.style.backgroundColor = coffeeColors[Math.floor(Math.random() * coffeeColors.length)];
+                    container.appendChild(bubble);
+                }
+            };
+
+            const initToggleImage = () => {
+                const toggleButton = document.querySelector('.toggle-image-button');
+                const imageWrapper = document.querySelector('.step-image-wrapper');
+                if (toggleButton && imageWrapper) {
+                    toggleButton.addEventListener('click', () => {
+                        imageWrapper.classList.toggle('is-visible');
+                    });
+                }
+            };
+
+            const initImageModal = () => {
+                const modal = document.getElementById('image-modal');
+                const modalImage = document.getElementById('modal-image-content');
+                const featureImages = document.querySelectorAll('.feature-image');
+                if (!modal || !modalImage) return;
+                featureImages.forEach(img => {
+                    img.addEventListener('click', () => {
+                        modalImage.src = img.src;
+                        modal.classList.add('is-visible');
+                        document.body.classList.add('no-scroll');
+                    });
+                });
+                modal.addEventListener('click', () => {
+                    modal.classList.remove('is-visible');
+                    document.body.classList.remove('no-scroll');
+                });
+            };
+
+            // 全ての初期化関数を実行
+            initYouTubePlayer();
+            initScrollAnimations();
+            initBubbleAnimation();
+            initToggleImage();
+            initImageModal();
+        });
+    </script>
+</body>
+</html>
